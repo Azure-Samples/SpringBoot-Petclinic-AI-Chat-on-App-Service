@@ -17,4 +17,4 @@ The following prerequisites are required to use this application. Please ensure 
 
 A blog post tutorial for this application can be found [here](https://techcommunity.microsoft.com/t5/apps-on-azure-blog/deploy-intelligent-springboot-apps-using-azure-openai-and-azure/ba-p/4257130).
 
-Deploy with AZD incoming soon!
+Deploy with AZD using `azd up`. By default, an in-memory database (H2) is used. To deploy and use an Azure MySQL Database, switch your Spring profile from h2 to mysql and uncomment the mysql database creation code in the bicep files under the `infra/` directory. 
