@@ -1,57 +1,20 @@
-# Project Name
+# [Spring PetClinic Sample Application](https://github.com/spring-projects/spring-petclinic) using a full set of Azure solutions
 
-(short, 1-3 sentenced, description of the project)
+* [Azure AppService](https://azure.microsoft.com/en-us/products/app-service/) for app hosting,
+* [Azure Database for MySQL](https://azure.microsoft.com/en-us/products/mysql/) for storage (optional, default is H2 in-memory database),
+* [Azure Monitor](https://azure.microsoft.com/en-us/products/monitor/)([Application Insights](https://learn.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview?tabs=net)) for monitoring and logging.
+* [Managed Identity](https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/overview) for passwordless secure connections. 
+* [Azure OpenAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/overview)
 
-## Features
+## Prerequisites
 
-This project framework provides the following features:
+The following prerequisites are required to use this application. Please ensure that you have them all installed locally.
 
-* Feature 1
-* Feature 2
-* ...
+* [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
+* Java 11 or later
 
-## Getting Started
+## Tutorial
 
-### Prerequisites
+A blog post tutorial for this application can be found [here](https://techcommunity.microsoft.com/t5/apps-on-azure-blog/deploy-intelligent-springboot-apps-using-azure-openai-and-azure/ba-p/4257130).
 
-(ideally very short, if any)
-
-- OS
-- Library version
-- ...
-
-### Installation
-
-(ideally very short)
-
-- npm install [package name]
-- mvn install
-- ...
-
-### Quickstart
-(Add steps to get up and running quickly)
-
-1. git clone [repository clone url]
-2. cd [repository name]
-3. ...
-
-
-## Demo
-
-A demo app is included to show how to use the project.
-
-To run the demo, follow these steps:
-
-(Add steps to start up the demo)
-
-1.
-2.
-3.
-
-## Resources
-
-(Any additional resources or related projects)
-
-- Link to supporting information
-- Link to similar sample
-- ...
+Deploy with AZD incoming soon!
