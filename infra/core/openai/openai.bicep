@@ -6,6 +6,7 @@ param tags object = {}
 param customSubDomainName string = name
 param deployments array = []
 param kind string = 'OpenAI'
+param userAssignedIdentityID string
 
 @allowed([ 'Enabled', 'Disabled' ])
 param publicNetworkAccess string = 'Enabled'
@@ -27,6 +28,12 @@ resource account 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
   location: location
   tags: tags
   kind: kind
+  identity:  {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${userAssignedIdentityID}': {}
+    }
+  }
   properties: {
     customSubDomainName: customSubDomainName
     publicNetworkAccess: publicNetworkAccess

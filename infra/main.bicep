@@ -10,6 +10,7 @@ param environmentName string
 param location string
 
 param appName string = ''
+param openAIName string = ''
 param applicationInsightsDashboardName string = ''
 param applicationInsightsName string = ''
 param appServicePlanName string = ''
@@ -17,6 +18,7 @@ param appServicePlanName string = ''
 param keyVaultName string = ''
 param logAnalyticsName string = ''
 param resourceGroupName string = ''
+param managedIdentityName string = ''
 
 @description('Id of the user or app to assign application roles')
 param principalId string = ''
@@ -84,6 +86,7 @@ module managedidentity './core/security/managedidentity.bicep' = {
   name: 'managedidentity'
   scope: rg
   params: {
+    identityName: !empty(managedIdentityName) ? managedIdentityName : '${abbrs.keyVaultVaults}${resourceToken}-mi'
     location: location
     tags: tags
   }
@@ -112,6 +115,8 @@ module app './app/app.bicep' = {
     name: !empty(appName) ? appName : '${abbrs.webSitesAppService}petclinic-${resourceToken}'
     location: location
     tags: tags
+    managedIdentityID: managedidentity.outputs.userAssignedIdentityID
+    managedIdentityName: !empty(appName) ? appName : '${abbrs.webSitesAppService}petclinic-${resourceToken}-mi'
     applicationInsightsName: monitoring.outputs.applicationInsightsName
     appServicePlanId: appServicePlan.outputs.id
     keyVaultName: keyVault.outputs.name
@@ -120,21 +125,31 @@ module app './app/app.bicep' = {
       AZURE_KEY_VAULT_ENDPOINT: keyVault.outputs.endpoint
       SPRING_PROFILES_ACTIVE: 'azure,h2'
       OPENAI_DEPLOYMENT_NAME: openAi1.outputs.openaiendpoint
+      AZURE_CLIENT_ID: managedidentity.outputs.clientId
       //MYSQL_URL: mySql.outputs.endpoint
       //MYSQL_USER: mySqlServerAdminName
     }
   }
 }
 
+module roleAssignments './core/security/roleassignments.bicep' = {
+  scope: rg
+  name: 'role-assignments-mi'
+  params: {
+    managedIdentityID: managedidentity.outputs.userAssignedIdentityID
+    managedIdentityPrincipalID: managedidentity.outputs.principalId
+  }
+}
+
 // Give the API access to KeyVault
-module appKeyVaultAccess './core/security/keyvault-access.bicep' = {
+/*module appKeyVaultAccess './core/security/keyvault-access.bicep' = {
   name: 'app-keyvault-access'
   scope: rg
   params: {
     keyVaultName: keyVault.outputs.name
     principalId: app.outputs.APP_IDENTITY_PRINCIPAL_ID
   }
-}
+}*/
 
 
 @description('Location for the OpenAI resource group')
@@ -151,12 +166,13 @@ module openAi1 'core/openai/openai.bicep' = {
   name: 'openai1'
   scope: rg
   params: {
-    name: 'openai-resource-springai-01'
+    name: !empty(openAIName) ? openAIName : '${abbrs.webSitesAppService}petclinic-${resourceToken}-oai'
     location: openAiLocation
     tags: tags
     sku: {
       name: 'S0'
     }
+    userAssignedIdentityID: managedidentity.outputs.userAssignedIdentityID
     disableLocalAuth: true
     deployments: [
       {
@@ -182,16 +198,16 @@ module openAi1 'core/openai/openai.bicep' = {
 // - roleDefinitionId (Cognitive Service User), 
 // - principalId (app service instance) 
 // - scope (Cognitive Services account)
-module openAi1RoleAppService 'core/security/role.bicep' = {
+/*module openAi1RoleAppService 'core/security/role.bicep' = {
   scope: rg
   name: 'openai1-role-appservice'
   params: {
-    principalId: app.outputs.APP_IDENTITY_PRINCIPAL_ID
+    principalId: managedidentity.outputs.principalId
     // Cognitive Services OpenAI User
     roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
     principalType: 'ServicePrincipal'
   }
-}
+}*/
 
 
 
@@ -210,3 +226,4 @@ output AZURE_KEY_VAULT_NAME string = keyVault.outputs.name
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
 output SPRING_PROFILES_ACTIVE string = 'azure,h2'
+output AZURE_CLIENT_ID string = managedidentity.outputs.clientId
