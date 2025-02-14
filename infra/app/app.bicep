@@ -9,6 +9,8 @@ param appServicePlanId string
 param appSettings object = {}
 param keyVaultName string
 param serviceName string = 'petclinic'
+param managedIdentityID string
+param managedIdentityName string
 
 @description('JVM runtime options. Use this instead of defining JAVA_OPTS manually on appSettings.')
 param javaRuntimeOptions array = []
@@ -21,6 +23,7 @@ var defaultJavaRuntimeOptions = [ '-Djdk.attach.allowAttachSelf=true' ]
 module app '../core/host/appservice.bicep' = {
   name: '${name}-app-module'
   params: {
+    userAssignedIdentityID: managedIdentityID
     name: name
     location: location
     tags: union(tags, { 'azd-service-name': serviceName })
@@ -42,6 +45,6 @@ module app '../core/host/appservice.bicep' = {
   }
 }
 
-output APP_IDENTITY_PRINCIPAL_ID string = app.outputs.identityPrincipalId
+//output APP_IDENTITY_PRINCIPAL_ID string = app.outputs.identityPrincipalId
 output APP_NAME string = app.outputs.name
 output APP_URI string = app.outputs.uri

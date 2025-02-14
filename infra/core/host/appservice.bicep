@@ -30,10 +30,17 @@ param minimumElasticInstanceCount int = -1
 param numberOfWorkers int = -1
 param scmDoBuildDuringDeployment bool = false
 param use32BitWorkerProcess bool = false
+param userAssignedIdentityID string
+
+
 
 resource appService 'Microsoft.Web/sites@2022-03-01' = {
   name: name
   location: location
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {'${userAssignedIdentityID}': {}}
+  }
   tags: tags
   kind: kind
   properties: {
@@ -90,7 +97,7 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' existing
   name: applicationInsightsName
 }
 
-output identityPrincipalId string =  appService.identity.principalId
+//output identityPrincipalId string =  appService.identity.principalId
 output name string = appService.name
 output uri string = 'https://${appService.properties.defaultHostName}'
 
